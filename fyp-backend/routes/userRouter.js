@@ -77,9 +77,20 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.delete("/delete", auth, async (req, res) => {
+router.get("/all", (req, res) => {
+  User.find((err, docs) => {
+    if (!err) res.send(docs);
+    else
+      console.log(
+        "Error while retrieving all records: " +
+          JSON.stringify(err, undefined, 2)
+      );
+  });
+});
+
+router.delete("/delete/:id", async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user);
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
     res.json(deletedUser);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -103,11 +114,17 @@ router.post("/tokenIsValid", async (req, res) => {
   }
 });
 
-router.get("/", auth, async (req, res) => {
-  const user = await User.findById(req.user);
-  res.json({
-    displayName: user.displayName,
-    id: user._id,
-  });
+router.get("/", async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    res.json({
+      displayName: user.displayName,
+      id: user._id,
+      role: user.role,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 module.exports = router;

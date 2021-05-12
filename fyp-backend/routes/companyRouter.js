@@ -1,8 +1,7 @@
 const express = require("express");
 var router = express.Router();
 var ObjectID = require("mongoose").Types.ObjectId;
-
-var { Company } = require("../models/company");
+const Company = require("../models/company");
 
 router.get("/", (req, res) => {
   Company.find((err, docs) => {
@@ -15,20 +14,25 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/", (req, res) => {
-  var newRecord = new Company({
-    title: req.body.title,
-    ticker: req.body.ticker,
-    domain: req.body.domain,
-    status: req.body.status,
-  });
-  newRecord.save((err, docs) => {
-    if (!err) res.send(docs);
-    else
-      console.log(
-        "Error while creating new record: " + JSON.stringify(err, undefined, 2)
-      );
-  });
+router.post("/add", async (req, res) => {
+  try {
+    let { title, ticker, domain, status } = req.body;
+    const existingComapny = await Company.findOne({ ticker: ticker });
+    if (existingComapny)
+      return res
+        .status(400)
+        .json({ msg: "A Company with this ticker already exists." });
+    const newCompany = new Company({
+      title,
+      ticker,
+      domain,
+      status: "true",
+    });
+    const savedCompany = await newCompany.save();
+    res.status(200).json({ msg: "Comapny Added Successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.put("/:id", (req, res) => {

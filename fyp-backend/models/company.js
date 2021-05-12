@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-var Company = mongoose.model("Company", {
-  title: { type: String },
-  ticker: { type: String },
-  domain: { type: String },
-  status: { type: Boolean },
+const companySchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  ticker: { type: String, required: true },
+  domain: { type: String, required: true },
+  status: { type: Boolean, required: true },
 });
 
-module.exports = { Company };
+module.exports = Company = mongoose.model("companies", companySchema);
