@@ -108,16 +108,6 @@ print(rmse)
 train = data[:training_data_len]
 valid = data[training_data_len:]
 valid['Predictions'] = predictions
-# Visualize the data
-plt.figure(figsize=(16, 8))
-plt.title('Model')
-plt.xlabel('Date', fontsize=18)
-plt.ylabel('Close Price USD ($)', fontsize=18)
-plt.plot(train['Close'])
-plt.plot(valid[['Close', 'Predictions']])
-plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
-plt.show()
-
 
 # Show the valid and predicted prices
 print(valid)
