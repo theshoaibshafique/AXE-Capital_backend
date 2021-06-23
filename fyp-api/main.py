@@ -40,11 +40,14 @@ class Model(Resource):
         df_train = data[['Date','Close']]
         df_train = df_train.rename(columns={"Date": "ds", "Close": "y"})
 
-        m = Prophet()
+        m = Prophet(changepoint_prior_scale=2.5)
+        m.add_seasonality(name='monthly', period=21, fourier_order=10)
         m.fit(df_train)
         future = m.make_future_dataframe(periods=period)
+        future['day'] = future['ds'].dt.weekday
+        future = future[future['day']<=4]
         forecast = m.predict(future)
-        forecast['predicted_value'] = forecast['trend'] + forecast['additive_terms']
+        forecast['predicted_value'] = forecast['yhat'] 
         forecast['ds']=forecast['ds'].dt.strftime("%Y-%m-%d")  
         res = forecast.to_dict(orient='records')
         return res
@@ -53,8 +56,9 @@ class Model(Resource):
         res = self.pro(ticker)
         return res
 
-    
 
+p1=Model();
+p1.pro('TSLA')
 
 api.add_resource(StockData, "/stockdata/<string:ticker>")
 api.add_resource(Model,"/getdata/<string:ticker>")
